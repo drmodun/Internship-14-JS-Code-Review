@@ -1,6 +1,7 @@
 *{
     background-color: #333;
     font-family: helvetica;
+    box-sizing: border-box;
 }
 .background{
     display: flex;
@@ -12,7 +13,7 @@
     display: flex;
     flex-direction: column;
     color: #FFF;
-    width: 1000px;
+    width: 1250px;
 }
 .code-header{
     background-color: #36454F;
@@ -22,34 +23,54 @@
 .code-content{
     display: flex;
     flex-direction: row;
-    width: 90%;
+    width: 100%;
     min-height: 100px;
     background-color: #28282B;
     border: 1px #F5F5F5 solid;
     border-top: hidden;
     border-radius: 0px 0px 20px 20px;
-    padding: 5%;
+    padding: 2.5%;
 }
-.code-content > p{
+.line{
+    width: 100%;
     background-color: #28282B;
-    font-size: 10px;
+    display: flex;
+    flex-direction: row;
+    min-height: 20px;
+    height: fit-content;
 }
-.line-numbers{
-    background-color: #28282B;
-    font-size: 10px;
-    margin-top: 10px;
+.line-number{
     margin-right: 20px;
+    background-color: #28282B;
+}
+.line-content{
+    min-width: 400px;
+    max-width: 600px;
+    margin-right: 50px;
+    background-color: #28282B;
+
+}
+.line-comments{
+    min-width: 300px;
+    display: flex;
+    background-color: #28282B;
+    flex-direction: row;
+    max-width: 700px;
+    flex-wrap: wrap;
 }
 .comment{
-    margin-top: 30px;
     display: flex;
     flex-direction: column;
     color:#F5F5F5;
-    width: 300px;
-
+    min-width: 300px;
+    max-width: 500px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    background-color: #28282B;
+    
 }
 .comment-header{
-    background-color: #36454F;
+    background-color: #585858;
     padding: 15px 10px;
     border-radius: 20px 20px 0px 0px;
     display: flex;
@@ -57,37 +78,83 @@
 }
 .likes{
     display: flex;
-     background-color: #36454F;
+    background-color: #585858;
      font-size: 12px;
      margin: 0px 10px;
 }
 .date{
     display: flex;
-     background-color: #36454F;
+    background-color: #585858;
      font-size: 12px;
      margin: 0px 10px;
 }
 .like-button > img{
     display: flex;
-     background-color: #36454F;    
+    background-color: #585858;
      height: 15px;
      width: 15px;
 }
 .like-button{
     display: flex;
-     background-color: #36454F;
+    background-color: #585858;
 }
 .comment-content{
     display: flex;
-    flex-direction: row;
-    width: 90%;
+    flex-direction: column;
+    width: 100%;
     min-height: 50px;
-    background-color: #28282B;
+    background-color: #101010;
     border: 1px #F5F5F5 solid;
     border-top: hidden;
     border-radius: 0px 0px 20px 20px;
-    padding: 5%;
+    padding: 2.5%;
+    min-height: 70px;
 }
 .comment-content{
     font-size: 10px;
+}
+.comment-input{
+    background-color: #101010;
+    border: hidden;
+    width: 500px;
+    color: #FFF;
+    resize: none;
+    margin: 20px 0px;
+}
+.user-input{
+    padding: 1%;
+    width: 550px;
+    max-width: unset;
+}
+.comment-buttons{
+    background-color: #101010;
+
+}
+.button-local{
+    background-color: aquamarine;
+    height: 30px;
+    border: 1px solid #F5F5F5;
+    border-radius: 10px;
+}
+.button-server{
+    background-color: chocolate;
+    height: 30px;
+    border: 1px solid #F5F5F5;
+    border-radius: 10px;
+}
+.button-new{
+    background-color: cadetblue;
+    min-width: 300px;
+    height: 30px;
+    border: 1px solid #F5F5F5;
+    border-radius: 10px;
+    align-self: center;
+}
+.button-delete{
+    margin-top: 20px;
+    background-color: crimson;
+    min-width: 100px;
+    height: 30px;
+    border: 1px solid #F5F5F5;
+    border-radius: 10px;
 }
