@@ -41,6 +41,7 @@
     margin-right: 20px;
 }
 .comment{
+    margin-top: 30px;
     display: flex;
     flex-direction: column;
     color:#F5F5F5;
@@ -65,4 +66,28 @@
      background-color: #36454F;
      font-size: 12px;
      margin: 0px 10px;
+}
+.like-button > img{
+    display: flex;
+     background-color: #36454F;    
+     height: 15px;
+     width: 15px;
+}
+.like-button{
+    display: flex;
+     background-color: #36454F;
+}
+.comment-content{
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    min-height: 50px;
+    background-color: #28282B;
+    border: 1px #F5F5F5 solid;
+    border-top: hidden;
+    border-radius: 0px 0px 20px 20px;
+    padding: 5%;
+}
+.comment-content{
+    font-size: 10px;
 }
