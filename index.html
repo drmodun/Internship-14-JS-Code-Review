@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,43 +8,62 @@
     <title>14th homework</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class = "background">
+    <div class="background">
         <div class="code">
             <div class="code-header">
                 apihsdfpasdhopasd
                 <!--link to server account name and other things-->
             </div>
             <div class="code-content">
-                <div class="line">
-                    <span class="line-number">
-                        1
-                    </span>
-                    <span class="line-content">
-                        sdzfoasdzouif sdfzsodif zsiod isodfisdf iosd 
-                    </span>
-                    <div class="line-comments">
-                        <div class = "comment">
+                <div class="line-main">
+                    <div class="line">
+                        <span class="line-number">
+                            1
+                        </span>
+                        <span class="line-content">
+                            sdzfoasdzouif sdfzsodif zsiod isodfisdf iosd
+                        </span>
+                        <div class="line-comments">
+                            <div class="comment">
+                                <div class="comment-header">
+                                    <div class="date">afafsfa
+                                    </div>
+                                    <div class="likes">Likes</div>
+                                    <a class="like-button"><img src="assets/likeoff.png" alt=""></a>
+                                </div>
+                                <div class="comment-content">
+                                    hgasdfoias ifafghsaf uisdfuis fuisdf
+                                    <button class="button-delete">Delete comment</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="new-comment">
+                        <div class=" comment user-input   ">
                             <div class="comment-header">
                                 <div class="date">afafsfa
                                 </div>
                                 <div class="likes">Likes</div>
                                 <a class="like-button"><img src="assets/likeoff.png" alt=""></a>
                             </div>
-                            <div class="comment-content">
-                                hgasdfoias ifafghsaf uisdfuis fuisdf
-                                <button class="button-delete">Delete comment</button>
+                            <div class="comment-content ">
+                                <textarea rows="10" cols="20" wrap="hard" class="comment-input"
+                                    placeholder="Write comment text here" maxlength="500" id="active-input"></textarea>
+                                <div class="comment-buttons">
+                                    <button class="button-local">Save as private note</button>
+                                    <button class="button-server">Save to server</button>
+                                    <button class="button-cancel">Cancel</button>
+                                </div>
                             </div>
-
                         </div>
-                        
-                        <button class="button-new">Write a new comment</button>
                     </div>
                 </div>
-                
+
             </div>
         </div>
-        <div class = " comment user-input   ">
+        <div class=" comment user-input   ">
             <div class="comment-header">
                 <div class="date">afafsfa
                 </div>
@@ -51,14 +71,16 @@
                 <a class="like-button"><img src="assets/likeoff.png" alt=""></a>
             </div>
             <div class="comment-content ">
-                <textarea rows="10" cols="20" wrap="hard" class = "comment-input" placeholder="Write comment text here" maxlength="500" id="active-input"></textarea>
+                <textarea rows="10" cols="20" wrap="hard" class="comment-input" placeholder="Write comment text here"
+                    maxlength="500" id="active-input"></textarea>
                 <div class="comment-buttons">
-                     <button class="button-local">Save as private note</button>
-                     <button class="button-server">Save to server</button>
+                    <button class="button-local">Save as private note</button>
+                    <button class="button-server">Save to server</button>
                 </div>
             </div>
         </div>
     </div>
     <script src="js.js"></script>
 </body>
+
 </html>
