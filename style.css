@@ -22,7 +22,7 @@
 }
 .code-content{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     width: 100%;
     min-height: 100px;
     background-color: #28282B;
@@ -173,3 +173,9 @@
     display: none;
     background-color: #28282B;
 }
+.error-message{
+    display: none;
+    color: crimson;
+    background-color: transparent;
+    margin: 10px 0px 0px 0px;
+};
