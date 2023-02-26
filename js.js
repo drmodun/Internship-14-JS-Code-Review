@@ -1,10 +1,9 @@
 const code = document.querySelector(".code-content")
 const lines = [...document.querySelectorAll(".line")];
-const comments = [...document.querySelectorAll(".comment")];
+let comments = [...document.querySelectorAll(".comment")];
 const commentsByLine = [];
 let localComments = [];
 const closedEvent = new Event("close")
-const reloadEvent = new Event("reload")
 const allCancelButtons = [...document.querySelectorAll(".button-cancel")];
 const allLocalSubmitButtons = [...document.querySelectorAll(".button-local")]
 let allDeleteButtons = document.querySelectorAll(".button-delete")
@@ -73,7 +72,8 @@ lines.forEach(element => {
             reloadComments.appendChild(addComment);
         }
     })
-    allDeleteButtons = document.querySelectorAll(".button-delete")
+    allDeleteButtons = [...document.querySelectorAll(".button-delete")]
+    comments = [...document.querySelectorAll(".comment")];
     element.addEventListener("mouseover", (event) => {
         if (isFocused)
             return;
@@ -139,8 +139,33 @@ allLocalSubmitButtons.forEach(button => {
             location.reload()
         }
         else {
-            button.parentElement.parentElement.children[2].style.display = "flex"
+            button.parentElement.parentElement.children[2].style.display = "flex";
         }
     })
 })
+allDeleteButtons.forEach(button=>{
+    button.addEventListener("click", event=>{
+        const index = comments.indexOf(button.parentElement.parentElement)
+        comments.splice(index, 1);
+        localComments.splice(index, 1);
+        local.setItem("comments", JSON.stringify(localComments));
+        button.parentElement.parentElement.remove();
+})
+})
+let allLikeButtons = [...document.querySelectorAll(".like-button")];
+allLikeButtons.forEach(button=>{
+    const index = comments.indexOf(button.parentElement.parentElement)
+    button.addEventListener("click", event=>{
+        if (localComments[index].liked){
+            button.children[0].src = "assets/likeoff.png";
+            localComments[index].liked = false
+        }
+        else{
+            button.children[0].src = "assets/likeon.png";
+            localComments[index].liked = true
+        }
+        local.setItem("comments", JSON.stringify(localComments));
+    })
+    
 
+})
