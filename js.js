@@ -107,7 +107,6 @@ function StartUp() {
         })
     })
     allServerSubmitButtons.forEach(button=>{
-
         button.addEventListener("click", async e =>{
             console.log()
             const inputValue = button.parentElement.parentElement.children[0].value.trim();
@@ -127,15 +126,25 @@ function StartUp() {
     })
     let allLikeButtons = [...document.querySelectorAll(".like-button")];
     allLikeButtons.forEach(button => {
-        const index = comments.indexOf(button.parentElement.parentElement)
-        button.addEventListener("click", event => {
-            if (localComments[index].liked) {
+        const index = allCommentsElements.indexOf(button.parentElement.parentElement)
+        button.addEventListener("click", async e => {
+            if (allComments[index].liked) {
                 button.children[0].src = "assets/likeoff.png";
-                localComments[index].liked = false
+                allComments[index].liked = false
+                const updateResponse = await UpdateLikedComment(allComments[index].id, false);
+                if (updateResponse===-1){
+                    console.error("Error on comment update");
+                    return;
+                }
             }
             else {
                 button.children[0].src = "assets/likeon.png";
-                localComments[index].liked = true
+                allComments[index].liked = true;
+                const updateResponse = await UpdateLikedComment(allComments[index].id, true);
+                if (updateResponse===-1){
+                    console.error("Error on comment update");
+                    return;
+                }
             }
             local.setItem("comments", JSON.stringify(localComments));
         })
@@ -372,7 +381,7 @@ async function UpdateLikedComment(id, isLiked){
             })
         })
         const returnValue = await response.json()
-        if (!response.ok){console.error(returnValue)
+        if (!response.ok){console.error(returnValue, response.ok)
         throw response.status}
     }
     catch(err){
