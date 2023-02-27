@@ -1,3 +1,4 @@
+const allComments = []
 function StartUp() {
     const code = document.querySelector(".code-content")
     const lines = [...document.querySelectorAll(".line")];
@@ -90,12 +91,19 @@ function StartUp() {
         })
     })
     allDeleteButtons.forEach(button => {
-        button.addEventListener("click", event => {
+        button.addEventListener("click", event => async function(){
             const index = comments.indexOf(button.parentElement.parentElement)
             comments.splice(index, 1);
-            localComments.splice(index, 1);
-            local.setItem("comments", JSON.stringify(localComments));
+            //localComments.splice(index, 1);
+            //local.setItem("comments", JSON.stringify(localComments));
+
             button.parentElement.parentElement.remove();
+        })
+    })
+    allServerSubmitButtons.forEach(button=>{
+
+        button.addEventListener("click", event=>async function(){
+            return 1;
         })
     })
     let allLikeButtons = [...document.querySelectorAll(".like-button")];
@@ -158,12 +166,12 @@ function MakeNewComment(text, liked, date) {
     commentContent.appendChild(deleteButton);
     comment.appendChild(commentContent);
     return comment;
-
+    
 }
 
 /*let local = window.localStorage;
 if (local.getItem("comments") === null)
-    local.setItem("comments", JSON.stringify(localComments))
+local.setItem("comments", JSON.stringify(localComments))
 localComments = JSON.parse(local.getItem("comments"));
 allCancelButtons.forEach(button => {
     button.addEventListener("click", event => {
@@ -180,8 +188,71 @@ allCancelButtons.forEach(button => {
     }).
 }
 function GetCode() {
-
+    
 }*/
+function MakeNewLine(text, comments, lineNumber) {
+    const lineRow = document.createElement("div");
+    lineRow.classList.add("line-main");
+    const line = document.createElement("div");
+    line.classList.add("line");
+    const lineNumberLabel = document.createElement("span");
+    lineNumberLabel.classList.add("line-number");
+    lineNumberLabel.innerHTML = lineNumber+1;
+    const lineContent = document.createElement("span");
+    lineContent.classList.add("line-content");
+    lineContent.innerHTML = text;
+    const lineComments =  document.createElement("div");
+    lineComments.classList.add("line-comments")
+    comments.forEach(comment=>{
+        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt)));
+    })
+    //add comments much later
+    line.appendChild(lineNumberLabel);
+    line.appendChild(lineContent);
+    line.appendChild(lineComments);
+    const newCommentRow = document.createElement("div");
+    const newComment = document.createElement("div")
+    newCommentRow.classList.add("new-comment");
+    newComment.classList.add("comment", "user-input");
+    let commentHeader = document.createElement("div");
+    commentHeader.classList.add("comment-header");
+    commentHeader.innerHTML = "This is your new comment";
+    newComment.appendChild(commentHeader);
+    const commentContent = document.createElement("div");
+    const commentTextArea = document.createElement("textarea");
+    const commentButtons = document.createElement("div");
+    commentButtons.classList.add("comment-buttons");
+    commentTextArea.rows = 10;
+    commentTextArea.cols = 20;
+    commentTextArea.wrap = "hard";
+    commentTextArea.placeholder = "Write comment text here";
+    commentTextArea.classList.add("comment-input");
+    commentContent.appendChild(commentTextArea);
+    commentContent.classList.add("comment-content");
+    const cancelButton = document.createElement("button")
+    cancelButton.innerHTML = "Cancel"
+    cancelButton.classList.add("button-cancel");
+    const makePrivateCommentButton = document.createElement("button")
+    makePrivateCommentButton.innerHTML = "Save as private Note"
+    makePrivateCommentButton.classList.add("button-local");
+    commentButtons.appendChild(makePrivateCommentButton);
+    const makeServerCommentButton = document.createElement("button")
+    makeServerCommentButton.innerHTML = "Save to server"
+    makeServerCommentButton.classList.add("button-server");
+    commentButtons.appendChild(makeServerCommentButton);
+    commentButtons.appendChild(cancelButton);
+    commentContent.appendChild(commentButtons);
+    const errorMessage = document.createElement("span");
+    errorMessage.classList.add("error-message");
+    errorMessage.innerHTML = "You cannot send an empty comment";
+    commentContent.appendChild(errorMessage);
+    newComment.appendChild(commentContent);
+    newCommentRow.appendChild(newComment);
+    lineRow.appendChild(line);
+    lineRow.appendChild(newCommentRow);
+    const insertLocation = document.querySelector(".code-content");
+    insertLocation.appendChild(lineRow);
+}
 async function GetCode() {
     try {
         const response = await fetch(baseURL + "code", {
@@ -250,68 +321,44 @@ async function PostComment(text, line){
         return -1;
     }
 }
-function MakeNewLine(text, comments, lineNumber) {
-    const lineRow = document.createElement("div");
-    lineRow.classList.add("line-main");
-    const line = document.createElement("div");
-    line.classList.add("line");
-    const lineNumberLabel = document.createElement("span");
-    lineNumberLabel.classList.add("line-number");
-    lineNumberLabel.innerHTML = lineNumber+1;
-    const lineContent = document.createElement("span");
-    lineContent.classList.add("line-content");
-    lineContent.innerHTML = text;
-    const lineComments =  document.createElement("div");
-    lineComments.classList.add("line-comments")
-    comments.forEach(comment=>{
-        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt)));
-    })
-    //add comments much later
-    line.appendChild(lineNumberLabel);
-    line.appendChild(lineContent);
-    line.appendChild(lineComments);
-    const newCommentRow = document.createElement("div");
-    const newComment = document.createElement("div")
-    newCommentRow.classList.add("new-comment");
-    newComment.classList.add("comment", "user-input");
-    let commentHeader = document.createElement("div");
-    commentHeader.classList.add("comment-header");
-    commentHeader.innerHTML = "This is your new comment";
-    newComment.appendChild(commentHeader);
-    const commentContent = document.createElement("div");
-    const commentTextArea = document.createElement("textarea");
-    const commentButtons = document.createElement("div");
-    commentButtons.classList.add("comment-buttons");
-    commentTextArea.rows = 10;
-    commentTextArea.cols = 20;
-    commentTextArea.wrap = "hard";
-    commentTextArea.placeholder = "Write comment text here";
-    commentTextArea.classList.add("comment-input");
-    commentContent.appendChild(commentTextArea);
-    commentContent.classList.add("comment-content");
-    const cancelButton = document.createElement("button")
-    cancelButton.innerHTML = "Cancel"
-    cancelButton.classList.add("button-cancel");
-    const makePrivateCommentButton = document.createElement("button")
-    makePrivateCommentButton.innerHTML = "Save as private Note"
-    makePrivateCommentButton.classList.add("button-local");
-    commentButtons.appendChild(makePrivateCommentButton);
-    const makeServerCommentButton = document.createElement("button")
-    makeServerCommentButton.innerHTML = "Save to server"
-    makeServerCommentButton.classList.add("button-server");
-    commentButtons.appendChild(makeServerCommentButton);
-    commentButtons.appendChild(cancelButton);
-    commentContent.appendChild(commentButtons);
-    const errorMessage = document.createElement("span");
-    errorMessage.classList.add("error-message");
-    errorMessage.innerHTML = "You cannot send an empty comment";
-    commentContent.appendChild(errorMessage);
-    newComment.appendChild(commentContent);
-    newCommentRow.appendChild(newComment);
-    lineRow.appendChild(line);
-    lineRow.appendChild(newCommentRow);
-    const insertLocation = document.querySelector(".code-content");
-    insertLocation.appendChild(lineRow);
+async function DeleteComment(id){
+    try{
+        const response = await fetch(baseURL+"remove/"+id, {
+            headers: {
+                key
+            },
+            method : "DELETE"
+        })
+        if (!response.ok){
+            console.error(response)
+            throw response.status;
+        }
+    }
+    catch(err){
+        console.log(err);
+        return -1;
+    }
+}
+async function UpdateLikedComment(id, isLiked){
+    try{
+        const response = await fetch(baseURL+"update-is-liked/"+id, {
+            headers : {
+                key,
+                "Content-Type" : "application/json"
+            },
+            method : "PUT",
+            body : JSON.stringify({
+                isLiked
+            })
+        })
+        const returnValue = await response.json()
+        if (!response.ok){console.error(returnValue)
+        throw response.status}
+    }
+    catch(err){
+        console.log(err);
+        return -1;
+    }
 }
 async function ConstructCode() {
     try {
