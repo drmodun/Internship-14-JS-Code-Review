@@ -44,6 +44,7 @@ function StartUp() {
             lineComponents.forEach(component => {
                 component.style.backgroundColor = "	#54524c"
             })
+            element.dispatchEvent(closedEvent);
             element.parentElement.children[1].style.display = "flex";
         })
 
@@ -53,6 +54,7 @@ function StartUp() {
             lineComponents.forEach(component => {
                 component.style.backgroundColor = "	#28282B"
             })
+            element.parentElement.children[1].style.display = "none";
         })
         element.addEventListener("close", event => {
             element.parentElement.children[1].style.display = "none";
