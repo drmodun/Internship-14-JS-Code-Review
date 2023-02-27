@@ -7,6 +7,8 @@ const closedEvent = new Event("close")
 const allCancelButtons = [...document.querySelectorAll(".button-cancel")];
 const allLocalSubmitButtons = [...document.querySelectorAll(".button-local")]
 let allDeleteButtons = document.querySelectorAll(".button-delete")
+const key = "drmodun";
+const baseURL = "https://homework-server1.onrender.com/"
 document.querySelectorAll("button").forEach(button => {
     button.addEventListener("mouseover", event => {
         button.style.cursor = "pointer"
@@ -143,29 +145,85 @@ allLocalSubmitButtons.forEach(button => {
         }
     })
 })
-allDeleteButtons.forEach(button=>{
-    button.addEventListener("click", event=>{
+allDeleteButtons.forEach(button => {
+    button.addEventListener("click", event => {
         const index = comments.indexOf(button.parentElement.parentElement)
         comments.splice(index, 1);
         localComments.splice(index, 1);
         local.setItem("comments", JSON.stringify(localComments));
         button.parentElement.parentElement.remove();
-})
+    })
 })
 let allLikeButtons = [...document.querySelectorAll(".like-button")];
-allLikeButtons.forEach(button=>{
+allLikeButtons.forEach(button => {
     const index = comments.indexOf(button.parentElement.parentElement)
-    button.addEventListener("click", event=>{
-        if (localComments[index].liked){
+    button.addEventListener("click", event => {
+        if (localComments[index].liked) {
             button.children[0].src = "assets/likeoff.png";
             localComments[index].liked = false
         }
-        else{
+        else {
             button.children[0].src = "assets/likeon.png";
             localComments[index].liked = true
         }
         local.setItem("comments", JSON.stringify(localComments));
     })
-    
+
 
 })
+/*function GetComments() {
+    fetch(baseURL + "comments", {
+        headers: {
+            key: "drmodun"
+        },
+        method: "GET"
+    }).
+}
+function GetCode() {
+
+}*/
+async function GetCode() {
+    try {
+        const response = await fetch(baseURL + "code", {
+            headers: {
+                key,
+            },
+            method: "GET"
+        })
+        if (!response.ok)
+            throw response.status;
+        else{
+            const returnValue = await response.json(); 
+            console.log(returnValue)
+            const code = returnValue.code.split("\n");
+            console.log(code)
+            return code;
+        }
+    }
+    catch(err){
+        console.error(err); 
+    }
+}
+async function GetComments(){
+    try {
+        const response = await fetch(baseURL + "comments", {
+            headers: {
+                key,
+            },
+            method: "GET"
+        })
+        if (!response.ok)
+            throw response.status;
+        else{
+            const returnValue = await response.json(); 
+            console.log(returnValue)
+            return returnValue;
+        }
+    }
+    catch(err){
+        console.error(err); 
+    }
+}
+function MakeNewLine(){
+    return null;
+}

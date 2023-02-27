@@ -1,26 +1,30 @@
-*{
+* {
     background-color: #333;
     font-family: helvetica;
     box-sizing: border-box;
 }
-.background{
+
+.background {
     display: flex;
     align-items: center;
     margin-top: 18vh;
     flex-direction: column;
 }
-.code{
+
+.code {
     display: flex;
     flex-direction: column;
     color: #FFF;
     width: 1250px;
 }
-.code-header{
+
+.code-header {
     background-color: #36454F;
     padding: 15px 10px;
     border-radius: 20px 20px 0px 0px;
 }
-.code-content{
+
+.code-content {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -31,12 +35,14 @@
     border-radius: 0px 0px 20px 20px;
     padding: 2.5%;
 }
-.line-main{
+
+.line-main {
     width: 100%;
     display: flex;
     flex-direction: column;
 }
-.line{
+
+.line {
     width: 100%;
     background-color: #28282B;
     display: flex;
@@ -44,18 +50,21 @@
     min-height: 20px;
     height: fit-content;
 }
-.line-number{
+
+.line-number {
     margin-right: 20px;
     background-color: #28282B;
 }
-.line-content{
+
+.line-content {
     min-width: 400px;
     max-width: 600px;
     margin-right: 50px;
     background-color: #28282B;
 
 }
-.line-comments{
+
+.line-comments {
     min-width: 300px;
     display: flex;
     background-color: #28282B;
@@ -63,47 +72,54 @@
     max-width: 700px;
     flex-wrap: wrap;
 }
-.comment{
+
+.comment {
     display: flex;
     flex-direction: column;
-    color:#F5F5F5;
+    color: #F5F5F5;
     min-width: 300px;
     max-width: 500px;
     margin-right: 20px;
     margin-bottom: 20px;
     background-color: transparent;
-    
+
 }
-.comment-header{
+
+.comment-header {
     background-color: #585858;
     padding: 15px 10px;
     border-radius: 20px 20px 0px 0px;
     display: flex;
-    flex-direction:row ;
+    flex-direction: row;
 }
-.likes{
+
+.likes {
     display: flex;
     background-color: #585858;
-     font-size: 12px;
-     margin: 0px 10px;
+    font-size: 12px;
+    margin: 0px 10px;
 }
-.date{
+
+.date {
     display: flex;
     background-color: #585858;
-     font-size: 12px;
-     margin: 0px 10px;
+    font-size: 12px;
+    margin: 0px 10px;
 }
-.like-button > img{
+
+.like-button>img {
     display: flex;
     background-color: #585858;
-     height: 15px;
-     width: 15px;
+    height: 15px;
+    width: 15px;
 }
-.like-button{
+
+.like-button {
     display: flex;
     background-color: #585858;
 }
-.comment-content{
+
+.comment-content {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -117,10 +133,12 @@
     max-width: 550px;
     word-wrap: break-word;
 }
-.comment-content{
+
+.comment-content {
     font-size: 10px;
 }
-.comment-input{
+
+.comment-input {
     background-color: #101010;
     border: hidden;
     width: 500px;
@@ -128,28 +146,33 @@
     resize: none;
     margin: 20px 0px;
 }
-.user-input{
+
+.user-input {
     padding: 1%;
     width: 550px;
     max-width: unset;
 }
-.comment-buttons{
+
+.comment-buttons {
     background-color: #101010;
 
 }
-.button-local{
+
+.button-local {
     background-color: aquamarine;
     height: 30px;
     border: 1px solid #F5F5F5;
     border-radius: 10px;
 }
-.button-server{
+
+.button-server {
     background-color: chocolate;
     height: 30px;
     border: 1px solid #F5F5F5;
     border-radius: 10px;
 }
-.button-new{
+
+.button-new {
     background-color: cadetblue;
     min-width: 300px;
     height: 30px;
@@ -157,7 +180,8 @@
     border-radius: 10px;
     align-self: center;
 }
-.button-delete{
+
+.button-delete {
     margin-top: 20px;
     background-color: crimson;
     min-width: 100px;
@@ -165,19 +189,24 @@
     border: 1px solid #F5F5F5;
     border-radius: 10px;
 }
-.button-cancel{
+
+.button-cancel {
     background-color: crimson;
     height: 30px;
     border: 1px solid #F5F5F5;
     border-radius: 10px;
 }
-.new-comment{
+
+.new-comment {
     display: none;
     background-color: #28282B;
 }
-.error-message{
+
+.error-message {
     display: none;
     color: crimson;
     background-color: transparent;
     margin: 10px 0px 0px 0px;
-};
+}
+
+;
