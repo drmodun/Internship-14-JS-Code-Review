@@ -7,6 +7,7 @@ function StartUp() {
     const closedEvent = new Event("close")
     const allCancelButtons = [...document.querySelectorAll(".button-cancel")];
     const allLocalSubmitButtons = [...document.querySelectorAll(".button-local")]
+    const allServerSubmitButtons = [...document.querySelectorAll(".button-server")];
     let allDeleteButtons = document.querySelectorAll(".button-delete")
     lines.forEach(element => {
         element.tabIndex = -1;
@@ -17,12 +18,6 @@ function StartUp() {
         commentsByLine.push(lineComments)
         const lineComponents = [...element.children];
         const reloadComments = element.children[2];
-        localComments.forEach(comment => {
-            if (comment.line === index) {
-                let addComment = MakeNewComment(comment.content, comment.liked, comment.date);
-                reloadComments.appendChild(addComment);
-            }
-        })
         allDeleteButtons = [...document.querySelectorAll(".button-delete")]
         comments = [...document.querySelectorAll(".comment")];
         element.addEventListener("mouseover", (event) => {
@@ -209,7 +204,7 @@ async function GetCode() {
         console.error(err);
     }
 }
-async function GetComments() {
+async function GetCommentsServer() {
     try {
         const response = await fetch(baseURL + "comments", {
             headers: {
@@ -222,12 +217,37 @@ async function GetComments() {
         else {
             const returnValue = await response.json();
             console.log(returnValue)
-            return returnValue;
+            return returnValue.comments;
         }
     }
     catch (err) {
         console.error(err);
         return ""
+    }
+}
+async function PostComment(text, line){
+    try{
+        const response = await fetch(baseURL + "create", {
+            method: "POST",
+            headers: {
+                key,
+                "Content-Type": "application/json" 
+            },
+            body : JSON.stringify({
+                line,
+                text
+            })
+        })
+        const returnValue = await response.json()
+        if (!response.ok){
+            console.log(returnValue);
+            throw response.status;
+        }
+        return returnValue;
+    }
+    catch(err){
+        console.log(err)
+        return -1;
     }
 }
 function MakeNewLine(text, comments, lineNumber) {
@@ -243,6 +263,9 @@ function MakeNewLine(text, comments, lineNumber) {
     lineContent.innerHTML = text;
     const lineComments =  document.createElement("div");
     lineComments.classList.add("line-comments")
+    comments.forEach(comment=>{
+        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt)));
+    })
     //add comments much later
     line.appendChild(lineNumberLabel);
     line.appendChild(lineContent);
@@ -262,7 +285,7 @@ function MakeNewLine(text, comments, lineNumber) {
     commentTextArea.rows = 10;
     commentTextArea.cols = 20;
     commentTextArea.wrap = "hard";
-    commentTextArea.innerHTML = "Write comment text here";
+    commentTextArea.placeholder = "Write comment text here";
     commentTextArea.classList.add("comment-input");
     commentContent.appendChild(commentTextArea);
     commentContent.classList.add("comment-content");
@@ -295,10 +318,18 @@ async function ConstructCode() {
         const code = await GetCode();
         if (code.length === 0)
             throw "Error on Code request";
+        const comments = await GetCommentsServer();
+        console.log(comments)
+        if (comments.length === 0)
+            throw "Error on comments request";
         code.forEach(line => {
-            MakeNewLine(line, {}, code.indexOf(line));
+            const index = code.indexOf(line);
+            MakeNewLine(line, comments.filter(comment=>{
+                return comment.line===index+1;
+            }), index);
         })
         StartUp();
+
     }
     catch (err) {
         console.log(err);
