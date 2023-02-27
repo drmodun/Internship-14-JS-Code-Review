@@ -1,8 +1,8 @@
-const allComments = []
+let allComments = []
+const allCommentsElements = []
 function StartUp() {
     const code = document.querySelector(".code-content")
     const lines = [...document.querySelectorAll(".line")];
-    let comments = [...document.querySelectorAll(".comment")];
     const commentsByLine = [];
     let localComments = [];
     const closedEvent = new Event("close")
@@ -20,7 +20,6 @@ function StartUp() {
         const lineComponents = [...element.children];
         const reloadComments = element.children[2];
         allDeleteButtons = [...document.querySelectorAll(".button-delete")]
-        comments = [...document.querySelectorAll(".comment")];
         element.addEventListener("mouseover", (event) => {
             if (isFocused)
                 return;
@@ -60,7 +59,7 @@ function StartUp() {
 
         })
     })
-    allLocalSubmitButtons.forEach(button => {
+    /*allLocalSubmitButtons.forEach(button => {
         button.addEventListener("click", event => {
             button.parentElement.parentElement.children[2].style.display = "none"
             const inputValue = button.parentElement.parentElement.children[0].value.trim()
@@ -89,11 +88,18 @@ function StartUp() {
                 button.parentElement.parentElement.children[2].style.display = "flex";
             }
         })
-    })
+    })*/
     allDeleteButtons.forEach(button => {
-        button.addEventListener("click", event => async function(){
-            const index = comments.indexOf(button.parentElement.parentElement)
-            comments.splice(index, 1);
+        button.addEventListener("click", async e=>{
+            const index = allCommentsElements.indexOf(button.parentElement.parentElement)
+            allCommentsElements.splice(index, 1);
+            const deleteResponse = DeleteComment(allComments[index].id);
+            if (deleteResponse===-1){
+                console.error("Error in deleting comment");
+                return
+            }
+            allComments.splice(index, 1);
+            
             //localComments.splice(index, 1);
             //local.setItem("comments", JSON.stringify(localComments));
 
@@ -102,7 +108,20 @@ function StartUp() {
     })
     allServerSubmitButtons.forEach(button=>{
 
-        button.addEventListener("click", event=>async function(){
+        button.addEventListener("click", async e =>{
+            console.log()
+            const inputValue = button.parentElement.parentElement.children[0].value.trim();
+            if (inputValue.length===0){     
+                console.error("You cannot send an empty message");
+                button.parentElement.parentElement.children[2].style.display = "flex";
+                return
+            }
+            const postResponse = await PostComment(inputValue, allServerSubmitButtons.indexOf(button)+1);
+            if (postResponse===-1){
+                console.error("Error on comment post");
+                return
+            }
+            location.reload();
             return 1;
         })
     })
@@ -165,6 +184,7 @@ function MakeNewComment(text, liked, date) {
     deleteButton.classList.add("button-delete");
     commentContent.appendChild(deleteButton);
     comment.appendChild(commentContent);
+    allCommentsElements.push(comment);
     return comment;
     
 }
@@ -369,11 +389,13 @@ async function ConstructCode() {
         console.log(comments)
         if (comments.length === 0)
             throw "Error on comments request";
+        allComments = [...comments];
+        let iterator = 0;
         code.forEach(line => {
-            const index = code.indexOf(line);
             MakeNewLine(line, comments.filter(comment=>{
-                return comment.line===index+1;
-            }), index);
+                return comment.line===iterator+1;
+            }), iterator);
+            iterator+=1;
         })
         StartUp();
 
