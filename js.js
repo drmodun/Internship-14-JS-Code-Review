@@ -18,7 +18,6 @@ function StartUp() {
         const lineComments = [...element.children[2].querySelectorAll(".comment")];
         commentsByLine.push(lineComments)
         const lineComponents = [...element.children];
-        const reloadComments = element.children[2];
         allDeleteButtons = [...document.querySelectorAll(".button-delete")]
         element.addEventListener("mouseover", (event) => {
             if (isFocused)
@@ -45,6 +44,9 @@ function StartUp() {
                 component.style.backgroundColor = "	#54524c"
             })
             element.dispatchEvent(closedEvent);
+            lines.forEach(turnOffLine=>{
+                turnOffLine.parentElement.children[1].style.display = "none"
+            })
             element.parentElement.children[1].style.display = "flex";
         })
 
@@ -94,16 +96,12 @@ function StartUp() {
         button.addEventListener("click", async e=>{
             const index = allCommentsElements.indexOf(button.parentElement.parentElement)
             allCommentsElements.splice(index, 1);
-            const deleteResponse = DeleteComment(allComments[index].id);
+            const deleteResponse = await DeleteComment(allComments[index].id);
             if (deleteResponse===-1){
-                console.error("Error in deleting comment");
+                console.error("Error in  deleting comment");
                 return
             }
             allComments.splice(index, 1);
-            
-            //localComments.splice(index, 1);
-            //local.setItem("comments", JSON.stringify(localComments));
-
             button.parentElement.parentElement.remove();
         })
     })
@@ -121,33 +119,71 @@ function StartUp() {
                 console.error("Error on comment post");
                 return
             }
-            location.reload();
-            return 1;
+            const responseComment = postResponse.comment;
+            const comment = MakeNewComment(inputValue, false, new Date());
+            allCommentsElements.push(comment);
+            allComments.push(responseComment);
+            console.log(comment);
+            comment.children[0].children[1].addEventListener("click", async e=>{
+                const index = allComments.indexOf(responseComment);
+                if (allComments[index].isLiked) {
+                    const updateResponse = await UpdateLikedComment(allComments[index].id, false);
+                    if (updateResponse===-1){
+                        console.error("Error on comment update");
+                        return;
+                    }
+                    allComments[index].isLiked = false
+                    comment.children[0].children[1].children[0].src = "assets/likeoff.png";
+                }
+                else {
+                    allComments[index].isLiked = true;
+                    const updateResponse = await UpdateLikedComment(allComments[index].id, true);
+                    if (updateResponse===-1){
+                        console.error("Error on comment update");
+                        return;
+                    }
+                    comment.children[0].children[1].children[0].src = "assets/likeon.png";
+                }
+            })
+            comment.children[1].children[0].addEventListener("click", async e=>{
+                const index = allComments.indexOf(responseComment);
+                const respnseDelete = await DeleteComment(responseComment.id);
+                if (respnseDelete===-1){
+                    console.log("Error on delete posted comment");
+                    return -1;
+                }
+                allCommentsElements.splice(index, 1);
+                allComments.splice(index,1);
+                comment.remove();
+            })
+            lines[allServerSubmitButtons.indexOf(button)].children[2].appendChild(comment);
+            lines[allServerSubmitButtons.indexOf(button)].dispatchEvent(closedEvent);
+            button.parentElement.parentElement.children[0].value = "";
+            return 1;       
         })
     })
     let allLikeButtons = [...document.querySelectorAll(".like-button")];
     allLikeButtons.forEach(button => {
-        const index = allCommentsElements.indexOf(button.parentElement.parentElement)
+        const index = allCommentsElements.indexOf(button.parentElement.parentElement);
         button.addEventListener("click", async e => {
-            if (allComments[index].liked) {
-                button.children[0].src = "assets/likeoff.png";
-                allComments[index].liked = false
+            if (allComments[index].isLiked) {
                 const updateResponse = await UpdateLikedComment(allComments[index].id, false);
                 if (updateResponse===-1){
                     console.error("Error on comment update");
                     return;
                 }
+                allComments[index].isLiked = false
+                button.children[0].src = "assets/likeoff.png";
             }
             else {
                 button.children[0].src = "assets/likeon.png";
-                allComments[index].liked = true;
+                allComments[index].isLiked = true;
                 const updateResponse = await UpdateLikedComment(allComments[index].id, true);
                 if (updateResponse===-1){
                     console.error("Error on comment update");
                     return;
                 }
             }
-            local.setItem("comments", JSON.stringify(localComments));
         })
 
 
@@ -192,6 +228,8 @@ function MakeNewComment(text, liked, date) {
     const deleteButton = document.createElement("button")
     deleteButton.innerHTML = "Delete comment"
     deleteButton.classList.add("button-delete");
+    deleteButton.addEventListener("click", async e=>{
+    })
     commentContent.appendChild(deleteButton);
     comment.appendChild(commentContent);
     allCommentsElements.push(comment);
@@ -234,9 +272,9 @@ function MakeNewLine(text, comments, lineNumber) {
     const lineComments =  document.createElement("div");
     lineComments.classList.add("line-comments")
     comments.forEach(comment=>{
+        allComments.push(comment);
         lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt)));
     })
-    //add comments much later
     line.appendChild(lineNumberLabel);
     line.appendChild(lineContent);
     line.appendChild(lineComments);
@@ -344,6 +382,7 @@ async function PostComment(text, line){
             console.log(returnValue);
             throw response.status;
         }
+        console.log(returnValue);
         return returnValue;
     }
     catch(err){
@@ -381,8 +420,8 @@ async function UpdateLikedComment(id, isLiked){
                 isLiked
             })
         })
-        const returnValue = await response.json()
-        if (!response.ok){console.error(returnValue, response.ok)
+        if (!response.ok){
+            console.error(xresponse.ok)
         throw response.status}
     }
     catch(err){
@@ -399,7 +438,7 @@ async function ConstructCode() {
         console.log(comments)
         if (comments.length === 0)
             throw "Error on comments request";
-        allComments = [...comments];
+        //formatedComments = [...comments];
         let iterator = 0;
         code.forEach(line => {
             MakeNewLine(line, comments.filter(comment=>{

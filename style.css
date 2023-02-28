@@ -92,6 +92,9 @@
     display: flex;
     flex-direction: row;
 }
+.comment-header-local{
+    background-color: aquamarine;
+}
 
 .likes {
     display: flex;
