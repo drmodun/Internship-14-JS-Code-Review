@@ -95,7 +95,6 @@
 .comment-header-local{
     background-color: aquamarine;
 }
-
 .likes {
     display: flex;
     background-color: #585858;
@@ -168,6 +167,10 @@
     border-radius: 10px;
 }
 
+.comment-local-content{
+    background-color: #606060;
+    color: #F5F5F5;
+}
 .button-server {
     background-color: chocolate;
     height: 30px;

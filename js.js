@@ -1,15 +1,18 @@
 let allComments = []
-const allCommentsElements = []
+const allCommentsElements = [];
+const local = window.localStorage;
 function StartUp() {
     const code = document.querySelector(".code-content")
     const lines = [...document.querySelectorAll(".line")];
     const commentsByLine = [];
-    let localComments = [];
+    let localComments = JSON.parse(local.getItem("comments"));
+    //create better mapping system
     const closedEvent = new Event("close")
     const allCancelButtons = [...document.querySelectorAll(".button-cancel")];
     const allLocalSubmitButtons = [...document.querySelectorAll(".button-local")]
     const allServerSubmitButtons = [...document.querySelectorAll(".button-server")];
     let allDeleteButtons = document.querySelectorAll(".button-delete")
+    console.log(allLocalSubmitButtons);
     lines.forEach(element => {
         element.tabIndex = -1;
         const index = lines.indexOf(element);
@@ -44,7 +47,7 @@ function StartUp() {
                 component.style.backgroundColor = "	#54524c"
             })
             element.dispatchEvent(closedEvent);
-            lines.forEach(turnOffLine=>{
+            lines.forEach(turnOffLine => {
                 turnOffLine.parentElement.children[1].style.display = "none"
             })
             element.parentElement.children[1].style.display = "flex";
@@ -62,73 +65,55 @@ function StartUp() {
 
         })
     })
-    /*allLocalSubmitButtons.forEach(button => {
-        button.addEventListener("click", event => {
-            button.parentElement.parentElement.children[2].style.display = "none"
-            const inputValue = button.parentElement.parentElement.children[0].value.trim()
-            if (inputValue.length > 0) {
-                const newComment = {
-                    line: allLocalSubmitButtons.indexOf(button),
-                    date: new Date(),
-                    content: inputValue,
-                    liked: false
-                };
-                console.log(newComment);
-                localComments.push(newComment);
-                localComments.sort((a, b) => {
-                    if (a.line > b.line)
-                        return 1
-                    else if (a.line === b.line)
-                        return 0;
-                    else
-                        return -1;
-                });
-                local.setItem("comments", JSON.stringify(localComments));
-                console.log()
-                location.reload()
-            }
-            else {
-                button.parentElement.parentElement.children[2].style.display = "flex";
-            }
-        })
-    })*/
     allDeleteButtons.forEach(button => {
-        button.addEventListener("click", async e=>{
-            const index = allCommentsElements.indexOf(button.parentElement.parentElement)
-            allCommentsElements.splice(index, 1);
-            const deleteResponse = await DeleteComment(allComments[index].id);
-            if (deleteResponse===-1){
-                console.error("Error in  deleting comment");
-                return
-            }
-            allComments.splice(index, 1);
-            button.parentElement.parentElement.remove();
-        })
+        const index = allCommentsElements.indexOf(button.parentElement.parentElement)
+        if (!localComments.includes(allComments[index])) {
+            button.addEventListener("click", async e => {
+                allCommentsElements.splice(index, 1);
+                const deleteResponse = await DeleteComment(allComments[index].id);
+                if (deleteResponse === -1) {
+                    console.error("Error in  deleting comment");
+                    return
+                }
+                allComments.splice(index, 1);
+                button.parentElement.parentElement.remove();
+            })
+        }
+        else {
+            button.addEventListener("click", event => {
+                allCommentsElements.splice(index, 1);
+                allComments.splice(index, 1);
+                localComments.splice(localComments.indexOf(allComments[index]), 1);
+                local.setItem("comments", JSON.stringify(localComments));
+                allCommentsElements[index].remove();
+            })
+        }
     })
-    allServerSubmitButtons.forEach(button=>{
-        button.addEventListener("click", async e =>{
+    allServerSubmitButtons.forEach(button => {
+        button.addEventListener("click", async e => {
             console.log()
             const inputValue = button.parentElement.parentElement.children[0].value.trim();
-            if (inputValue.length===0){     
+            if (inputValue.length === 0) {
                 console.error("You cannot send an empty message");
                 button.parentElement.parentElement.children[2].style.display = "flex";
                 return
             }
-            const postResponse = await PostComment(inputValue, allServerSubmitButtons.indexOf(button)+1);
-            if (postResponse===-1){
+            button.parentElement.parentElement.children[2].style.display = "none";
+            const postResponse = await PostComment(inputValue, allServerSubmitButtons.indexOf(button) + 1);
+            if (postResponse === -1) {
                 console.error("Error on comment post");
                 return
             }
             const responseComment = postResponse.comment;
-            const comment = MakeNewComment(inputValue, false, new Date());
+            const comment = MakeNewComment(inputValue, false, new Date(), false);
             allCommentsElements.push(comment);
             allComments.push(responseComment);
             console.log(comment);
-            comment.children[0].children[1].addEventListener("click", async e=>{
+            comment.children[0].children[1].addEventListener("click", async e => {
                 const index = allComments.indexOf(responseComment);
                 if (allComments[index].isLiked) {
                     const updateResponse = await UpdateLikedComment(allComments[index].id, false);
-                    if (updateResponse===-1){
+                    if (updateResponse === -1) {
                         console.error("Error on comment update");
                         return;
                     }
@@ -138,37 +123,83 @@ function StartUp() {
                 else {
                     allComments[index].isLiked = true;
                     const updateResponse = await UpdateLikedComment(allComments[index].id, true);
-                    if (updateResponse===-1){
+                    if (updateResponse === -1) {
                         console.error("Error on comment update");
                         return;
                     }
                     comment.children[0].children[1].children[0].src = "assets/likeon.png";
                 }
             })
-            comment.children[1].children[0].addEventListener("click", async e=>{
+            comment.children[1].children[0].addEventListener("click", async e => {
                 const index = allComments.indexOf(responseComment);
-                const respnseDelete = await DeleteComment(responseComment.id);
-                if (respnseDelete===-1){
+                const responseDelete = await DeleteComment(responseComment.id);
+                if (responseDelete === -1) {
                     console.log("Error on delete posted comment");
                     return -1;
                 }
                 allCommentsElements.splice(index, 1);
-                allComments.splice(index,1);
+                allComments.splice(index, 1);
                 comment.remove();
             })
             lines[allServerSubmitButtons.indexOf(button)].children[2].appendChild(comment);
             lines[allServerSubmitButtons.indexOf(button)].dispatchEvent(closedEvent);
             button.parentElement.parentElement.children[0].value = "";
-            return 1;       
+            return 1;
+        })
+    })
+    allLocalSubmitButtons.forEach(button => {
+        button.addEventListener("click", event => {
+            const inputValue = button.parentElement.parentElement.children[0].value.trim();
+            if (inputValue.length === 0) {
+                console.error("You cannot send an empty message");
+                button.parentElement.parentElement.children[2].style.display = "flex";
+                return
+            }
+            button.parentElement.parentElement.children[2].style.display = "none";
+            const newComment = {
+                text: inputValue,
+                createdAt: new Date(),
+                line: allLocalSubmitButtons.indexOf(button),
+                isLiked : false
+            };
+            const comment = MakeNewComment(inputValue, false, newComment.date, true);
+            allCommentsElements.push(comment);
+            allComments.push(newComment);
+            localComments.push(newComment);
+            local.setItem("comments", JSON.stringify(localComments));
+            lines[allLocalSubmitButtons.indexOf(button)].appendChild(comment);
+            console.log(comment);
+            comment.children[0].children[1].addEventListener("click", event => {
+                const index = allComments.indexOf(newComment);
+                if (newComment.isLiked) {
+                    newComment.isLiked = false;
+                    comment.children[0].children[1].children[0].src = "assets/likeoff.png";
+                    local.setItem("comments", JSON.stringify(localComments));
+                }
+                else {
+                    newComment.isLiked = true;
+                    comment.children[0].children[1].children[0].src = "assets/likeon.png";
+                    local.setItem("comments", JSON.stringify(localComments));
+                }
+            })
+            comment.children[1].children[0].addEventListener("click", event => {
+                const index = allComments.indexOf(newComment);
+                allCommentsElements.splice(index, 1);
+                allComments.splice(index, 1);
+                localComments.splice(localComments.index(newComment), 1);
+                local.setItem("comments", JSON.stringify(localComments));
+                comment.remove();
+            })
         })
     })
     let allLikeButtons = [...document.querySelectorAll(".like-button")];
     allLikeButtons.forEach(button => {
         const index = allCommentsElements.indexOf(button.parentElement.parentElement);
+        if (!localComments.includes(allComments[index])){
         button.addEventListener("click", async e => {
             if (allComments[index].isLiked) {
                 const updateResponse = await UpdateLikedComment(allComments[index].id, false);
-                if (updateResponse===-1){
+                if (updateResponse === -1) {
                     console.error("Error on comment update");
                     return;
                 }
@@ -179,12 +210,25 @@ function StartUp() {
                 button.children[0].src = "assets/likeon.png";
                 allComments[index].isLiked = true;
                 const updateResponse = await UpdateLikedComment(allComments[index].id, true);
-                if (updateResponse===-1){
+                if (updateResponse === -1) {
                     console.error("Error on comment update");
                     return;
                 }
             }
         })
+    }
+    else{
+        if (allComments[index].isLiked){
+            allComments[index].isLiked = false
+            button.children[0].src = "assets/likeoff.png";
+            local.setItem("comments", JSON.stringify(localComments));
+        }
+        else{
+            allComments[index].isLiked = true
+            button.children[0].src = "assets/likeon.png";
+            local.setItem("comments", JSON.stringify(localComments));
+        }
+    }
 
 
     })
@@ -202,12 +246,14 @@ const key = "drmodun";
 const baseURL = "https://homework-server1.onrender.com/"
 
 
-function MakeNewComment(text, liked, date) {
+function MakeNewComment(text, liked, date, isLocal) {
     date = new Date(date)
     let comment = document.createElement("div");
     comment.classList.add("comment");
     let commentHeader = document.createElement("div");
     commentHeader.classList.add("comment-header");
+    if (isLocal)
+        commentHeader.classList.add("comment-local-header");
     const commentDate = document.createElement("div");
     commentDate.classList.add("date");
     console.log(date)
@@ -225,55 +271,39 @@ function MakeNewComment(text, liked, date) {
     const commentText = document.createTextNode(text);
     commentContent.appendChild(commentText)
     commentContent.classList.add("comment-content");
+    if (isLocal)
+        commentHeader.classList.add("comment-local-content");
     const deleteButton = document.createElement("button")
     deleteButton.innerHTML = "Delete comment"
     deleteButton.classList.add("button-delete");
-    deleteButton.addEventListener("click", async e=>{
+    deleteButton.addEventListener("click", async e => {
     })
     commentContent.appendChild(deleteButton);
     comment.appendChild(commentContent);
     allCommentsElements.push(comment);
     return comment;
-    
-}
 
-/*let local = window.localStorage;
-if (local.getItem("comments") === null)
-local.setItem("comments", JSON.stringify(localComments))
-localComments = JSON.parse(local.getItem("comments"));
-allCancelButtons.forEach(button => {
-    button.addEventListener("click", event => {
-        lines[allCancelButtons.indexOf(button)].dispatchEvent(closedEvent);
-    });
-})
-*/
-/*function GetComments() {
-    fetch(baseURL + "comments", {
-        headers: {
-            key: "drmodun"
-        },
-        method: "GET"
-    }).
 }
-function GetCode() {
-    
-}*/
-function MakeNewLine(text, comments, lineNumber) {
+function MakeNewLine(text, comments, localComments, lineNumber) {
     const lineRow = document.createElement("div");
     lineRow.classList.add("line-main");
     const line = document.createElement("div");
     line.classList.add("line");
     const lineNumberLabel = document.createElement("span");
     lineNumberLabel.classList.add("line-number");
-    lineNumberLabel.innerHTML = lineNumber+1;
+    lineNumberLabel.innerHTML = lineNumber + 1;
     const lineContent = document.createElement("span");
     lineContent.classList.add("line-content");
     lineContent.innerHTML = text;
-    const lineComments =  document.createElement("div");
+    const lineComments = document.createElement("div");
     lineComments.classList.add("line-comments")
-    comments.forEach(comment=>{
+    comments.forEach(comment => {
         allComments.push(comment);
-        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt)));
+        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt, false)));
+    });
+    localComments.forEach(comment => {
+        allComments.push(comment);
+        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt, true)));
     })
     line.appendChild(lineNumberLabel);
     line.appendChild(lineContent);
@@ -364,67 +394,68 @@ async function GetCommentsServer() {
         return ""
     }
 }
-async function PostComment(text, line){
-    try{
+async function PostComment(text, line) {
+    try {
         const response = await fetch(baseURL + "create", {
             method: "POST",
             headers: {
                 key,
-                "Content-Type": "application/json" 
+                "Content-Type": "application/json"
             },
-            body : JSON.stringify({
+            body: JSON.stringify({
                 line,
                 text
             })
         })
         const returnValue = await response.json()
-        if (!response.ok){
+        if (!response.ok) {
             console.log(returnValue);
             throw response.status;
         }
         console.log(returnValue);
         return returnValue;
     }
-    catch(err){
+    catch (err) {
         console.log(err)
         return -1;
     }
 }
-async function DeleteComment(id){
-    try{
-        const response = await fetch(baseURL+"remove/"+id, {
+async function DeleteComment(id) {
+    try {
+        const response = await fetch(baseURL + "remove/" + id, {
             headers: {
                 key
             },
-            method : "DELETE"
+            method: "DELETE"
         })
-        if (!response.ok){
+        if (!response.ok) {
             console.error(response)
             throw response.status;
         }
     }
-    catch(err){
+    catch (err) {
         console.log(err);
         return -1;
     }
 }
-async function UpdateLikedComment(id, isLiked){
-    try{
-        const response = await fetch(baseURL+"update-is-liked/"+id, {
-            headers : {
+async function UpdateLikedComment(id, isLiked) {
+    try {
+        const response = await fetch(baseURL + "update-is-liked/" + id, {
+            headers: {
                 key,
-                "Content-Type" : "application/json"
+                "Content-Type": "application/json"
             },
-            method : "PUT",
-            body : JSON.stringify({
+            method: "PUT",
+            body: JSON.stringify({
                 isLiked
             })
         })
-        if (!response.ok){
-            console.error(xresponse.ok)
-        throw response.status}
+        if (!response.ok) {
+            console.error(response.ok)
+            throw response.status
+        }
     }
-    catch(err){
+    catch (err) {
         console.log(err);
         return -1;
     }
@@ -435,16 +466,25 @@ async function ConstructCode() {
         if (code.length === 0)
             throw "Error on Code request";
         const comments = await GetCommentsServer();
+        let localCommentsTry = local.getItem("comments");
+        let localComments=[];
+        if (localCommentsTry === null) {
+            console.log("local storage is empty");
+            local.setItem("comments", JSON.stringify([]));
+        }
+        else{
+            localComments = JSON.parse(localCommentsTry);
+        }
         console.log(comments)
         if (comments.length === 0)
             throw "Error on comments request";
         //formatedComments = [...comments];
         let iterator = 0;
         code.forEach(line => {
-            MakeNewLine(line, comments.filter(comment=>{
-                return comment.line===iterator+1;
-            }), iterator);
-            iterator+=1;
+            MakeNewLine(line, comments.filter(comment => {
+                return comment.line === iterator + 1;
+            }), localComments.filter(comment => { return comment.line === iterator + 1 }), iterator);
+            iterator += 1;
         })
         StartUp();
 
