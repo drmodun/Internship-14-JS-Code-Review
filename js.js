@@ -7,7 +7,7 @@ if (localCommentsTry === null) {
     console.log("local storage is empty");
     local.setItem("comments", JSON.stringify(localComments));
 }
-else{
+else {
     localComments = JSON.parse(localCommentsTry);
 }
 function StartUp() {
@@ -19,7 +19,6 @@ function StartUp() {
     const allCancelButtons = [...document.querySelectorAll(".button-cancel")];
     const allLocalSubmitButtons = [...document.querySelectorAll(".button-local")]
     const allServerSubmitButtons = [...document.querySelectorAll(".button-server")];
-    let allDeleteButtons = [...document.querySelectorAll(".button-delete")];
     console.log(allLocalSubmitButtons);
     lines.forEach(element => {
         element.tabIndex = -1;
@@ -29,10 +28,9 @@ function StartUp() {
         const lineComments = [...element.children[2].querySelectorAll(".comment")];
         commentsByLine.push(lineComments)
         const lineComponents = [...element.children];
-        allDeleteButtons = [...document.querySelectorAll(".button-delete")]
         element.addEventListener("mouseover", (event) => {
             if (isFocused)
-                return;
+            return;
             element.style.backgroundColor = "	#404040"
             element.style.cursor = "pointer"
             lineComponents.forEach(component => {
@@ -41,7 +39,7 @@ function StartUp() {
         })
         element.addEventListener("mouseout", (event) => {
             if (isFocused)
-                return;
+            return;
             element.style.backgroundColor = "#28282B"
             element.style.cursor = "default"
             lineComponents.forEach(component => {
@@ -60,7 +58,7 @@ function StartUp() {
             })
             element.parentElement.children[1].style.display = "flex";
         })
-
+        
         element.addEventListener("focusout", event => {
             isFocused = false
             element.style.backgroundColor = "#28282B"
@@ -70,16 +68,18 @@ function StartUp() {
         })
         element.addEventListener("close", event => {
             element.parentElement.children[1].style.display = "none";
-
+            
         })
     })
+    const allDeleteButtons = [...document.querySelectorAll(".button-delete")];
+    console.log(allDeleteButtons);
     allDeleteButtons.forEach(button => {
-        const index = allDeleteButtons.indexOf(button)
+        const index = allCommentsElements.indexOf(button.parentElement.parentElement)
         console.log(index, 1);
         console.log(allCommentsElements[index], button.parentElement.parentElement);
         if (!localComments.includes(allComments[index])) {
-            console.log("net", index);
             button.addEventListener("click", async e => {
+                console.log("net", index);
                 allCommentsElements.splice(index, 1);
                 const deleteResponse = await DeleteComment(allComments[index].id);
                 if (deleteResponse === -1) {
@@ -92,15 +92,15 @@ function StartUp() {
         }
         else {
             button.addEventListener("click", event => {
-                const index = allDeleteButtons.indexOf(button)
+                const index = allCommentsElements.indexOf(button.parentElement.parentElement)
                 console.log(index, 2)
                 console.log(index, allComments[index])
-                console.log(allCommentsElements[index]);
-                allComments.splice(index, 1);
-                allCommentsElements.splice(index, 1);
+                console.log(allCommentsElements[index], button.parentElement.parentElement);
                 localComments.splice(localComments.indexOf(allComments[index]), 1);
+                allComments.splice(index, 1);
                 local.setItem("comments", JSON.stringify(localComments));
                 allCommentsElements[index].remove();
+                allCommentsElements.splice(index, 1);
             })
         }
     })
@@ -121,7 +121,6 @@ function StartUp() {
             }
             const responseComment = postResponse.comment;
             const comment = MakeNewComment(inputValue, false, new Date(), false);
-            allCommentsElements.push(comment);
             allComments.push(responseComment);
             console.log(comment);
             comment.children[0].children[1].addEventListener("click", async e => {
@@ -175,10 +174,9 @@ function StartUp() {
                 text: inputValue,
                 createdAt: new Date(),
                 line: allLocalSubmitButtons.indexOf(button),
-                isLiked : false
+                isLiked: false
             };
             const comment = MakeNewComment(inputValue, false, newComment.createdAt, true);
-            allCommentsElements.push(comment);
             allComments.push(newComment);
             localComments.push(newComment);
             local.setItem("comments", JSON.stringify(localComments));
@@ -210,40 +208,45 @@ function StartUp() {
     let allLikeButtons = [...document.querySelectorAll(".like-button")];
     allLikeButtons.forEach(button => {
         const index = allCommentsElements.indexOf(button.parentElement.parentElement);
-        if (!localComments.includes(allComments[index])){
-        button.addEventListener("click", async e => {
-            if (allComments[index].isLiked) {
-                const updateResponse = await UpdateLikedComment(allComments[index].id, false);
-                if (updateResponse === -1) {
-                    console.error("Error on comment update");
-                    return;
+        if (!localComments.includes(allComments[index])) {
+            button.addEventListener("click", async e => {
+                const index = allCommentsElements.indexOf(button.parentElement.parentElement);
+                if (allComments[index].isLiked) {
+                    const updateResponse = await UpdateLikedComment(allComments[index].id, false);
+                    if (updateResponse === -1) {
+                        console.error("Error on comment update");
+                        return;
+                    }
+                    allComments[index].isLiked = false
+                    button.children[0].src = "assets/likeoff.png";
                 }
-                allComments[index].isLiked = false
+                else {
+                    allComments[index].isLiked = true;
+                    const updateResponse = await UpdateLikedComment(allComments[index].id, true);
+                    if (updateResponse === -1) {
+                        console.error("Error on comment update");
+                        return;
+                    }
+                    button.children[0].src = "assets/likeon.png";
+                }
+            })
+        }
+        else {
+            button.addEventListener("click", event=>{
+                const index = allCommentsElements.indexOf(button.parentElement.parentElement);
+                if (allComments[index].isLiked) {
+                    allComments[index].isLiked = false
                 button.children[0].src = "assets/likeoff.png";
+                local.setItem("comments", JSON.stringify(localComments));
             }
             else {
+                allComments[index].isLiked = true
                 button.children[0].src = "assets/likeon.png";
-                allComments[index].isLiked = true;
-                const updateResponse = await UpdateLikedComment(allComments[index].id, true);
-                if (updateResponse === -1) {
-                    console.error("Error on comment update");
-                    return;
-                }
+                local.setItem("comments", JSON.stringify(localComments));
             }
         })
-    }
-    else{
-        if (allComments[index].isLiked){
-            allComments[index].isLiked = false
-            button.children[0].src = "assets/likeoff.png";
-            local.setItem("comments", JSON.stringify(localComments));
         }
-        else{
-            allComments[index].isLiked = true
-            button.children[0].src = "assets/likeon.png";
-            local.setItem("comments", JSON.stringify(localComments));
-        }
-    }
+
 
 
     })
@@ -266,8 +269,6 @@ function MakeNewComment(text, liked, date, isLocal) {
     let comment = document.createElement("div");
     comment.classList.add("comment");
     let commentHeader = document.createElement("div");
-    if (isLocal)
-        commentHeader.classList.add("comment-local-header");
     commentHeader.classList.add("comment-header");
     const commentDate = document.createElement("div");
     commentDate.classList.add("date");
@@ -318,7 +319,7 @@ function MakeNewLine(text, comments, localComments, lineNumber) {
     });
     localComments.forEach(comment => {
         allComments.push(comment);
-        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt) ,true));
+        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt), true));
     })
     line.appendChild(lineNumberLabel);
     line.appendChild(lineContent);
@@ -366,7 +367,7 @@ function MakeNewLine(text, comments, localComments, lineNumber) {
     const insertLocation = document.querySelector(".code-content");
     insertLocation.appendChild(lineRow);
 }
-function DialogueWindow(){
+function DialogueWindow() {
     const answer = confirm("Ova akcija ce trajno promijeniti podatke aplikacije, kliknite ok za nastavak");
     return answer;
 }
