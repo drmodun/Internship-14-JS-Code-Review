@@ -1,17 +1,25 @@
 let allComments = []
 const allCommentsElements = [];
 const local = window.localStorage;
+let localComments = [];
+let localCommentsTry = local.getItem("comments");
+if (localCommentsTry === null) {
+    console.log("local storage is empty");
+    local.setItem("comments", JSON.stringify(localComments));
+}
+else{
+    localComments = JSON.parse(localCommentsTry);
+}
 function StartUp() {
     const code = document.querySelector(".code-content")
     const lines = [...document.querySelectorAll(".line")];
     const commentsByLine = [];
-    let localComments = JSON.parse(local.getItem("comments"));
     //create better mapping system
     const closedEvent = new Event("close")
     const allCancelButtons = [...document.querySelectorAll(".button-cancel")];
     const allLocalSubmitButtons = [...document.querySelectorAll(".button-local")]
     const allServerSubmitButtons = [...document.querySelectorAll(".button-server")];
-    let allDeleteButtons = document.querySelectorAll(".button-delete")
+    let allDeleteButtons = [...document.querySelectorAll(".button-delete")];
     console.log(allLocalSubmitButtons);
     lines.forEach(element => {
         element.tabIndex = -1;
@@ -66,8 +74,11 @@ function StartUp() {
         })
     })
     allDeleteButtons.forEach(button => {
-        const index = allCommentsElements.indexOf(button.parentElement.parentElement)
+        const index = allDeleteButtons.indexOf(button)
+        console.log(index, 1);
+        console.log(allCommentsElements[index], button.parentElement.parentElement);
         if (!localComments.includes(allComments[index])) {
+            console.log("net", index);
             button.addEventListener("click", async e => {
                 allCommentsElements.splice(index, 1);
                 const deleteResponse = await DeleteComment(allComments[index].id);
@@ -81,8 +92,12 @@ function StartUp() {
         }
         else {
             button.addEventListener("click", event => {
-                allCommentsElements.splice(index, 1);
+                const index = allDeleteButtons.indexOf(button)
+                console.log(index, 2)
+                console.log(index, allComments[index])
+                console.log(allCommentsElements[index]);
                 allComments.splice(index, 1);
+                allCommentsElements.splice(index, 1);
                 localComments.splice(localComments.indexOf(allComments[index]), 1);
                 local.setItem("comments", JSON.stringify(localComments));
                 allCommentsElements[index].remove();
@@ -162,7 +177,7 @@ function StartUp() {
                 line: allLocalSubmitButtons.indexOf(button),
                 isLiked : false
             };
-            const comment = MakeNewComment(inputValue, false, newComment.date, true);
+            const comment = MakeNewComment(inputValue, false, newComment.createdAt, true);
             allCommentsElements.push(comment);
             allComments.push(newComment);
             localComments.push(newComment);
@@ -186,7 +201,7 @@ function StartUp() {
                 const index = allComments.indexOf(newComment);
                 allCommentsElements.splice(index, 1);
                 allComments.splice(index, 1);
-                localComments.splice(localComments.index(newComment), 1);
+                localComments.splice(localComments.indexOf(newComment), 1);
                 local.setItem("comments", JSON.stringify(localComments));
                 comment.remove();
             })
@@ -251,9 +266,9 @@ function MakeNewComment(text, liked, date, isLocal) {
     let comment = document.createElement("div");
     comment.classList.add("comment");
     let commentHeader = document.createElement("div");
-    commentHeader.classList.add("comment-header");
     if (isLocal)
         commentHeader.classList.add("comment-local-header");
+    commentHeader.classList.add("comment-header");
     const commentDate = document.createElement("div");
     commentDate.classList.add("date");
     console.log(date)
@@ -268,11 +283,11 @@ function MakeNewComment(text, liked, date, isLocal) {
     commentHeader.appendChild(commentLiked);
     comment.appendChild(commentHeader);
     const commentContent = document.createElement("div");
+    if (isLocal)
+        commentContent.classList.add("comment-local-content");
     const commentText = document.createTextNode(text);
     commentContent.appendChild(commentText)
     commentContent.classList.add("comment-content");
-    if (isLocal)
-        commentHeader.classList.add("comment-local-content");
     const deleteButton = document.createElement("button")
     deleteButton.innerHTML = "Delete comment"
     deleteButton.classList.add("button-delete");
@@ -299,11 +314,11 @@ function MakeNewLine(text, comments, localComments, lineNumber) {
     lineComments.classList.add("line-comments")
     comments.forEach(comment => {
         allComments.push(comment);
-        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt, false)));
+        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt), false));
     });
     localComments.forEach(comment => {
         allComments.push(comment);
-        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt, true)));
+        lineComments.appendChild(MakeNewComment(comment.text, comment.isLiked, Date.parse(comment.createdAt) ,true));
     })
     line.appendChild(lineNumberLabel);
     line.appendChild(lineContent);
@@ -350,6 +365,10 @@ function MakeNewLine(text, comments, localComments, lineNumber) {
     lineRow.appendChild(newCommentRow);
     const insertLocation = document.querySelector(".code-content");
     insertLocation.appendChild(lineRow);
+}
+function DialogueWindow(){
+    const answer = confirm("Ova akcija ce trajno promijeniti podatke aplikacije, kliknite ok za nastavak");
+    return answer;
 }
 async function GetCode() {
     try {
@@ -466,15 +485,6 @@ async function ConstructCode() {
         if (code.length === 0)
             throw "Error on Code request";
         const comments = await GetCommentsServer();
-        let localCommentsTry = local.getItem("comments");
-        let localComments=[];
-        if (localCommentsTry === null) {
-            console.log("local storage is empty");
-            local.setItem("comments", JSON.stringify([]));
-        }
-        else{
-            localComments = JSON.parse(localCommentsTry);
-        }
         console.log(comments)
         if (comments.length === 0)
             throw "Error on comments request";
@@ -483,7 +493,7 @@ async function ConstructCode() {
         code.forEach(line => {
             MakeNewLine(line, comments.filter(comment => {
                 return comment.line === iterator + 1;
-            }), localComments.filter(comment => { return comment.line === iterator + 1 }), iterator);
+            }), localComments.filter(comment => { return comment.line === iterator }), iterator);
             iterator += 1;
         })
         StartUp();
