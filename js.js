@@ -87,6 +87,9 @@ function StartUp() {
         console.log(allCommentsElements[index], button.parentElement.parentElement);
         if (!localComments.includes(allComments[index])) {
             button.addEventListener("click", async e => {
+                const confirmation = DialogueWindow()
+                if (!confirmation)
+                    return;
                 const index = allCommentsElements.indexOf(button.parentElement.parentElement)
                 console.log("net", index);
                 allCommentsElements.splice(index, 1);
@@ -101,6 +104,9 @@ function StartUp() {
         }
         else {
             button.addEventListener("click", event => {
+                const confirmation = DialogueWindow()
+                if (!confirmation)
+                    return;
                 const index = allCommentsElements.indexOf(button.parentElement.parentElement)
                 console.log(index, 2)
                 console.log(index, allComments[index])
@@ -155,6 +161,9 @@ function StartUp() {
             })
             comment.children[1].children[0].addEventListener("click", async e => {
                 const index = allComments.indexOf(responseComment);
+                const confirmation = DialogueWindow()
+                if (!confirmation)
+                    return;
                 const responseDelete = await DeleteComment(responseComment.id);
                 if (responseDelete === -1) {
                     console.log("Error on delete posted comment");
@@ -205,6 +214,9 @@ function StartUp() {
             })
             comment.children[1].children[0].addEventListener("click", event => {
                 const index = allComments.indexOf(newComment);
+                const confirmation = DialogueWindow()
+                if (!confirmation)
+                    return;
                 allCommentsElements.splice(index, 1);
                 allComments.splice(index, 1);
                 localComments.splice(localComments.indexOf(newComment), 1);
