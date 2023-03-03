@@ -81,19 +81,15 @@ function StartUp() {
     console.log(allDeleteButtons);
     allDeleteButtons.forEach(button => {
         const index = allCommentsElements.indexOf(button.parentElement.parentElement)
-        console.log(index, 1);
-        console.log(allCommentsElements[index], button.parentElement.parentElement);
         if (!localComments.includes(allComments[index])) {
             button.addEventListener("click", async e => {
                 const confirmation = DialogueWindow()
                 if (!confirmation)
                     return;
                 const index = allCommentsElements.indexOf(button.parentElement.parentElement)
-                console.log("net", index);
                 allCommentsElements.splice(index, 1);
                 const deleteResponse = await DeleteComment(allComments[index].id);
                 if (deleteResponse === -1) {
-                    console.error("Error in  deleting comment");
                     return
                 }
                 allComments.splice(index, 1);
@@ -106,9 +102,6 @@ function StartUp() {
                 if (!confirmation)
                     return;
                 const index = allCommentsElements.indexOf(button.parentElement.parentElement)
-                console.log(index, 2)
-                console.log(index, allComments[index])
-                console.log(allCommentsElements[index], button.parentElement.parentElement);
                 localComments.splice(localComments.indexOf(allComments[index]), 1);
                 allComments.splice(index, 1);
                 local.setItem("comments", JSON.stringify(localComments));
@@ -119,29 +112,24 @@ function StartUp() {
     })
     allServerSubmitButtons.forEach(button => {
         button.addEventListener("click", async e => {
-            console.log()
             const inputValue = button.parentElement.parentElement.children[0].value.trim();
             if (inputValue.length === 0) {
-                console.error("You cannot send an empty message");
                 button.parentElement.parentElement.children[2].style.display = "flex";
                 return
             }
             button.parentElement.parentElement.children[2].style.display = "none";
             const postResponse = await PostComment(inputValue, allServerSubmitButtons.indexOf(button) + 1);
             if (postResponse === -1) {
-                console.error("Error on comment post");
                 return
             }
             const responseComment = postResponse.comment;
             const comment = MakeNewComment(inputValue, false, new Date(), false);
             allComments.push(responseComment);
-            console.log(comment);
             comment.children[0].children[1].addEventListener("click", async e => {
                 const index = allComments.indexOf(responseComment);
                 if (allComments[index].isLiked) {
                     const updateResponse = await UpdateLikedComment(allComments[index].id, false);
                     if (updateResponse === -1) {
-                        console.error("Error on comment update");
                         return;
                     }
                     allComments[index].isLiked = false
@@ -151,7 +139,6 @@ function StartUp() {
                     allComments[index].isLiked = true;
                     const updateResponse = await UpdateLikedComment(allComments[index].id, true);
                     if (updateResponse === -1) {
-                        console.error("Error on comment update");
                         return;
                     }
                     comment.children[0].children[1].children[0].src = "assets/likeon.png";
@@ -164,7 +151,6 @@ function StartUp() {
                     return;
                 const responseDelete = await DeleteComment(responseComment.id);
                 if (responseDelete === -1) {
-                    console.log("Error on delete posted comment");
                     return -1;
                 }
                 allCommentsElements.splice(index, 1);
@@ -181,7 +167,6 @@ function StartUp() {
         button.addEventListener("click", event => {
             const inputValue = button.parentElement.parentElement.children[0].value.trim();
             if (inputValue.length === 0) {
-                console.error("You cannot send an empty message");
                 button.parentElement.parentElement.children[2].style.display = "flex";
                 return
             }
@@ -196,7 +181,6 @@ function StartUp() {
             allComments.push(newComment);
             localComments.push(newComment);
             local.setItem("comments", JSON.stringify(localComments));
-            console.log(comment);
             comment.children[0].children[1].addEventListener("click", event => {
                 const index = allComments.indexOf(newComment);
                 if (newComment.isLiked) {
@@ -235,7 +219,6 @@ function StartUp() {
                 if (allComments[index].isLiked) {
                     const updateResponse = await UpdateLikedComment(allComments[index].id, false);
                     if (updateResponse === -1) {
-                        console.error("Error on comment update");
                         return;
                     }
                     allComments[index].isLiked = false
@@ -245,7 +228,6 @@ function StartUp() {
                     allComments[index].isLiked = true;
                     const updateResponse = await UpdateLikedComment(allComments[index].id, true);
                     if (updateResponse === -1) {
-                        console.error("Error on comment update");
                         return;
                     }
                     button.children[0].src = "assets/likeon.png";
