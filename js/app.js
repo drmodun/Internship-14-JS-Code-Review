@@ -20,8 +20,6 @@ function StartUp() {
     const allCancelButtons = [...document.querySelectorAll(".button-cancel")];
     const allLocalSubmitButtons = [...document.querySelectorAll(".button-local")]
     const allServerSubmitButtons = [...document.querySelectorAll(".button-server")];
-
-    console.log(allLocalSubmitButtons);
     lines.forEach(element => {
         element.tabIndex = -1;
         element.parentElement.tabIndex = 1;
@@ -163,11 +161,18 @@ function StartUp() {
                 allComments.splice(index, 1);
                 comment.remove();
             })
+            comment.children[1].children[0].addEventListener("mouseover", event=>{
+                comment.children[1].children[0].style.cursor = "pointer"
+            })
+            comment.children[1].children[0].addEventListener("mouseout", event=>{
+                comment.children[1].children[0].style.cursor = "default"
+            })
             lines[allServerSubmitButtons.indexOf(button)].children[2].appendChild(comment);
             lines[allServerSubmitButtons.indexOf(button)].dispatchEvent(closedEvent);
             button.parentElement.parentElement.children[0].value = "";
             return 1;
         })
+        
     })
 
     allLocalSubmitButtons.forEach(button => {
@@ -211,6 +216,12 @@ function StartUp() {
                 localComments.splice(localComments.indexOf(newComment), 1);
                 local.setItem("comments", JSON.stringify(localComments));
                 comment.remove();
+            })
+            comment.children[1].children[0].addEventListener("mouseover", event=>{
+                comment.children[1].children[0].style.cursor = "pointer"
+            })
+            comment.children[1].children[0].addEventListener("mouseout", event=>{
+                comment.children[1].children[0].style.cursor = "default"
             })
             lines[allLocalSubmitButtons.indexOf(button)].dispatchEvent(closedEvent);
             button.parentElement.parentElement.children[0].value = "";
