@@ -333,7 +333,10 @@ function MakeNewLine(text, comments, localComments, lineNumber) {
     lineNumberLabel.innerHTML = lineNumber + 1;
     const lineContent = document.createElement("span");
     lineContent.classList.add("line-content");
-    lineContent.innerHTML = text;
+    const lineText = document.createTextNode(text);
+    const lineTextElement = document.createElement("pre");
+    lineTextElement.appendChild(lineText);
+    lineContent.appendChild(lineTextElement);
     const lineComments = document.createElement("div");
     lineComments.classList.add("line-comments")
     comments.forEach(comment => {

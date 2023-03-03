@@ -28,7 +28,6 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-height: 100px;
     background-color: #28282B;
     border: 1px #F5F5F5 solid;
     border-top: hidden;
@@ -50,14 +49,18 @@
     min-height: 20px;
     height: fit-content;
 }
-
+.line-content > pre{
+    background-color: inherit;
+    color: #F5F5F5;
+    min-height: 20px;
+}
 .line-number {
     margin-right: 20px;
     background-color: #28282B;
 }
 
 .line-content {
-    min-width: 400px;
+    min-width: 500px;
     max-width: 600px;
     margin-right: 50px;
     background-color: #28282B;
