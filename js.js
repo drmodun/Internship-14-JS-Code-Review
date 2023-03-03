@@ -11,10 +11,8 @@ else {
     localComments = JSON.parse(localCommentsTry);
 }
 function StartUp() {
-    const code = document.querySelector(".code-content")
     const lines = [...document.querySelectorAll(".line")];
     const commentsByLine = [];
-    //create better mapping system
     const closedEvent = new Event("close")
     const allCancelButtons = [...document.querySelectorAll(".button-cancel")];
     const allLocalSubmitButtons = [...document.querySelectorAll(".button-local")]
@@ -515,7 +513,6 @@ async function ConstructCode() {
         console.log(comments)
         if (comments.length === 0)
             throw "Error on comments request";
-        //formatedComments = [...comments];
         let iterator = 0;
         code.forEach(line => {
             MakeNewLine(line, comments.filter(comment => {
@@ -530,3 +527,4 @@ async function ConstructCode() {
         console.log(err);
     }
 }
+ConstructCode()

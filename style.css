@@ -49,18 +49,20 @@
     min-height: 20px;
     height: fit-content;
 }
-.line-content > pre{
+
+.line-content>pre {
     background-color: inherit;
     color: #F5F5F5;
     min-height: 20px;
 }
+
 .line-number {
     margin-right: 20px;
     background-color: #28282B;
 }
 
 .line-content {
-    min-width: 500px;
+    min-width: 400px;
     max-width: 600px;
     margin-right: 50px;
     background-color: #28282B;
